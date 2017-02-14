@@ -1,16 +1,36 @@
 package com.gkatzioura.scala
 
+import java.util.StringTokenizer
+
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.io.{IntWritable, Text}
+import org.apache.hadoop.mapreduce.{Job, Mapper}
+
 
 /**
   * Created by gkatzioura on 2/14/17.
   */
 package object WordCount {
 
+  class TokenizerMapper extends Mapper[Object, Text, Text, IntWritable] {
+    val one = new IntWritable(1)
+    var word = new Text();
+    def map(key: Object,value: Text,context: Context) = {
+      val itr = new StringTokenizer(value.toString) ;
+      while (itr.hasMoreTokens()) {
+        word.set(itr.nextToken());
+        context.write(word, one);
+      }
+    }
+  }
+
 
   def main(args: Array[String]): Unit = {
-//    val configuration = new Configuration()
-//    Job job = Job.getInstance(conf, "word count");
-//    job.setJarByClass(WordCount.class);
+    val configuration = Configuration
+    val job = Job.getInstance(configuration,"word count")
+    job.setJarByClass(WordCount.getClass)
+//    job.setMapperClass()
+
 //    job.setMapperClass(TokenizerMapper.class);
 //    job.setCombinerClass(IntSumReducer.class);
 //    job.setReducerClass(IntSumReducer.class);
